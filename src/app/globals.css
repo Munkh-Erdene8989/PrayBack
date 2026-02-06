@@ -1,6 +1,34 @@
 @import "tailwindcss";
 
+/* ==========================================
+   Tenant Theme CSS Custom Properties
+   ==========================================
+   These are the defaults. They get overridden
+   at runtime by ThemeApplicator based on the
+   tenant's theme_config from the database.
+   ========================================== */
+
 :root {
+  /* Tenant brand colours */
+  --tenant-primary: #4F46E5;
+  --tenant-primary-hsl: 243 76% 59%;
+  --tenant-secondary: #7C3AED;
+  --tenant-secondary-hsl: 263 80% 58%;
+  --tenant-accent: #06B6D4;
+  --tenant-accent-hsl: 188 95% 43%;
+
+  /* Tenant header */
+  --tenant-header-bg: #ffffff;
+  --tenant-header-text: #111827;
+
+  /* Tenant footer */
+  --tenant-footer-bg: #ffffff;
+  --tenant-footer-text: #9CA3AF;
+
+  /* Tenant border radius */
+  --tenant-radius: 0.75rem;
+
+  /* Page colours */
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -10,6 +38,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Expose tenant colours to Tailwind utilities */
+  --color-tenant-primary: var(--tenant-primary);
+  --color-tenant-secondary: var(--tenant-secondary);
+  --color-tenant-accent: var(--tenant-accent);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +55,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--tenant-font, Arial, Helvetica, sans-serif);
 }

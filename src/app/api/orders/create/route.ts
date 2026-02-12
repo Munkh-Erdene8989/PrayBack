@@ -10,8 +10,8 @@ const createOrderSchema = z.object({
   delivery_note: z.string().optional(),
   items: z.array(z.object({
     book_id: z.string().uuid(),
+    quantity: z.number().positive().int(),
     unit_price: z.number().positive(),
-    // quantity removed - digital books are always 1 copy per order item
   })),
   subtotal: z.number().positive(),
   total_amount: z.number().positive(),

@@ -83,19 +83,33 @@ export async function POST(request: NextRequest) {
       subtotal: item.unit_price * item.quantity,
     }))
 
-    const { error: itemsError } = await supabase
+    console.log('[DEBUG] Order items to insert:', JSON.stringify(orderItems, null, 2))
+
+    const { data: insertedItems, error: itemsError } = await supabase
       .from('order_items')
       .insert(orderItems)
+      .select()
 
     if (itemsError) {
-      console.error('Order items creation error:', itemsError)
+      console.error('[ERROR] Order items creation failed!')
+      console.error('[ERROR] Error code:', itemsError.code)
+      console.error('[ERROR] Error message:', itemsError.message)
+      console.error('[ERROR] Error details:', JSON.stringify(itemsError, null, 2))
+      console.error('[ERROR] Items tried to insert:', JSON.stringify(orderItems, null, 2))
+      
       // Rollback order
       await supabase.from('orders').delete().eq('id', order.id)
       return NextResponse.json(
-        { error: 'Failed to create order items' },
+        { 
+          error: 'Failed to create order items',
+          details: itemsError.message,
+          code: itemsError.code 
+        },
         { status: 500 }
       )
     }
+
+    console.log('[DEBUG] Successfully inserted items:', JSON.stringify(insertedItems, null, 2))
 
     return NextResponse.json({
       success: true,

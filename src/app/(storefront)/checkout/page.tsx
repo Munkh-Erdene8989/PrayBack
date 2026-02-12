@@ -81,6 +81,7 @@ export default function CheckoutPage() {
           ...formData,
           items: items.map((item) => ({
             book_id: item.book.id,
+            quantity: item.quantity,
             unit_price: item.book.price,
           })),
           subtotal: getTotalPrice(),

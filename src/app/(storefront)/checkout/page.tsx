@@ -81,7 +81,7 @@ export default function CheckoutPage() {
           ...formData,
           items: items.map((item) => ({
             book_id: item.book.id,
-            quantity: item.quantity,
+            quantity: 1, // Digital books are always 1 copy
             unit_price: item.book.price,
           })),
           subtotal: getTotalPrice(),

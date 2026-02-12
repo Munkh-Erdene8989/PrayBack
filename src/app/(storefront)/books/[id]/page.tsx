@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import { notFound } from 'next/navigation'
 import { AddToCartButton } from '@/components/storefront/AddToCartButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function BookDetailPage({
   params,
 }: {

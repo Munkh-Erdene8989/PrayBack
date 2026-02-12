@@ -1,4 +1,6 @@
 import Link from 'next/link'
+export const dynamic = 'force-dynamic'
+
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
 import { BookCard } from '@/components/storefront/BookCard'

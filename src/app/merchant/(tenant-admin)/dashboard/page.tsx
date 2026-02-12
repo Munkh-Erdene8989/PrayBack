@@ -1,4 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server'
+export const dynamic = 'force-dynamic'
+
 import { getTenantSession } from '@/lib/auth/tenant-auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { redirect } from 'next/navigation'

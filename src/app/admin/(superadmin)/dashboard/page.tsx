@@ -1,4 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server'
+export const dynamic = 'force-dynamic'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function AdminDashboardPage() {

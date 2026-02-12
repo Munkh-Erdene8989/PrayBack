@@ -67,9 +67,9 @@ export async function createQPayInvoice(params: {
       qr_text: `https://qpay.mn/pay/${params.orderNumber}`,
       qr_image: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', // 1x1 transparent PNG
       urls: [
-        { name: 'Khan Bank', link: '#', logo: '' },
-        { name: 'TDB', link: '#', logo: '' },
-        { name: 'Golomt Bank', link: '#', logo: '' },
+        { name: 'Khan Bank', description: 'Khan Bank Mobile App', link: '#', logo: '' },
+        { name: 'TDB', description: 'TDB Mobile App', link: '#', logo: '' },
+        { name: 'Golomt Bank', description: 'Golomt Mobile App', link: '#', logo: '' },
       ],
     }
   }

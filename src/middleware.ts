@@ -45,14 +45,8 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Protect checkout route
-  if (pathname.startsWith('/checkout')) {
-    const session = request.cookies.get('session')
-    
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-  }
+  // Allow guest checkout - no authentication required
+  // Authentication check is handled in the checkout page component itself
 
   // Allow all other routes
   return supabaseResponse

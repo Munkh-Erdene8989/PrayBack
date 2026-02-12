@@ -19,8 +19,11 @@ let tokenCache: { token: string; expiresAt: number } | null = null
 async function getAccessToken(): Promise<string> {
   // Return cached token if still valid
   if (tokenCache && tokenCache.expiresAt > Date.now()) {
+    console.log('[DEBUG] Using cached QPay token')
     return tokenCache.token
   }
+
+  console.log('[DEBUG] QPay auth attempt:', QPAY_API_URL)
 
   // QPay v2 API uses Basic Authentication with CLIENT_ID:CLIENT_SECRET
   const credentials = Buffer.from(`${QPAY_CLIENT_ID}:${QPAY_CLIENT_SECRET}`).toString('base64')
@@ -45,6 +48,7 @@ async function getAccessToken(): Promise<string> {
   }
 
   const data: QPayTokenResponse = await response.json()
+  console.log('[DEBUG] QPay auth SUCCESS, expires in:', data.expires_in)
 
   // Cache token (subtract 60 seconds for safety margin)
   tokenCache = {

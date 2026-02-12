@@ -29,11 +29,18 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error || !order) {
+      console.log('[DEBUG] Order not found:', orderId)
       return NextResponse.json(
         { error: 'Order not found' },
         { status: 404 }
       )
     }
+
+    console.log('[DEBUG] Check status result:', {
+      orderId,
+      payment_status: order.payment_status,
+      order_number: order.order_number,
+    })
 
     return NextResponse.json({
       payment_status: order.payment_status,

@@ -23,7 +23,9 @@ export async function POST(request: NextRequest) {
     
     // Clean phone number (remove spaces, dashes, etc.)
     if (body.customer_phone) {
+      console.log('[DEBUG] Order create - raw phone:', body.customer_phone)
       body.customer_phone = body.customer_phone.replace(/\D/g, '')
+      console.log('[DEBUG] Order create - cleaned phone:', body.customer_phone)
     }
     
     const validation = createOrderSchema.safeParse(body)

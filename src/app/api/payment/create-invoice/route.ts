@@ -28,6 +28,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    console.log('[DEBUG] Creating QPay invoice:', order.order_number, order.total_amount)
+    
     // Create QPay invoice
     const invoice = await createQPayInvoice({
       orderNumber: order.order_number,
@@ -35,6 +37,8 @@ export async function POST(request: NextRequest) {
       amount: order.total_amount,
       description: `Номын захиалга #${order.order_number}`,
     })
+
+    console.log('[DEBUG] QPay invoice created:', invoice.invoice_id, !!invoice.qr_image)
 
     // Update order with invoice ID
     await supabase

@@ -65,8 +65,10 @@ export default function PaymentPage({
       })
 
       const data = await res.json()
+      console.log('[DEBUG] Payment status checked:', data.payment_status, 'NODE_ENV:', process.env.NODE_ENV)
 
       if (data.payment_status === 'PAID') {
+        console.log('[DEBUG] Payment PAID! Redirect?', process.env.NODE_ENV === 'production', data.order_number)
         // Redirect to success page in production
         if (process.env.NODE_ENV === 'production') {
           router.push(`/payment/success?orderNumber=${data.order_number}`)
@@ -115,6 +117,10 @@ export default function PaymentPage({
 
   const isMockMode = process.env.NEXT_PUBLIC_QPAY_MOCK_MODE === 'true' || invoice?.invoice_id?.startsWith('MOCK_')
   const isDevelopment = process.env.NODE_ENV === 'development'
+
+  if (invoice) {
+    console.log('[DEBUG] Environment:', {isDevelopment, nodeEnv: process.env.NODE_ENV, isMockMode})
+  }
 
   if (loading) {
     return (

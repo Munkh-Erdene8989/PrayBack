@@ -3,15 +3,16 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const supabase = await createClient()
     
     const { data: book, error } = await supabase
       .from('books')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('is_active', true)
       .single()
 

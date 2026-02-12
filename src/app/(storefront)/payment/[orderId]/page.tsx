@@ -4,10 +4,9 @@ import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { QPayInvoiceResponse } from '@/types'
-import { CheckCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function PaymentPage({
   params,
@@ -19,15 +18,47 @@ export default function PaymentPage({
   const [invoice, setInvoice] = useState<QPayInvoiceResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState(false)
-  const [successModalOpen, setSuccessModalOpen] = useState(false)
-  const [orderNumber, setOrderNumber] = useState('')
 
   useEffect(() => {
     createInvoice()
     
-    // Poll for payment status every 5 seconds
-    const interval = setInterval(checkPaymentStatus, 5000)
-    return () => clearInterval(interval)
+    // Set up Supabase Realtime subscription for instant updates
+    const supabase = createClient()
+    
+    console.log('🔔 Setting up realtime subscription for order:', orderId)
+    
+    const channel = supabase
+      .channel(`order-${orderId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `id=eq.${orderId}`,
+        },
+        (payload) => {
+          console.log('🔔 Realtime update received:', payload)
+          
+          if (payload.new && payload.new.payment_status === 'PAID') {
+            console.log('🎉 Payment confirmed via realtime! Redirecting...')
+            toast.success('Төлбөр амжилттай төлөгдлөө!')
+            router.push(`/payment/success?orderNumber=${payload.new.order_number}`)
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 Realtime subscription status:', status)
+      })
+    
+    // Also poll as backup (every 10 seconds instead of 5)
+    const interval = setInterval(checkPaymentStatus, 10000)
+    
+    return () => {
+      console.log('🔌 Cleaning up realtime subscription')
+      clearInterval(interval)
+      supabase.removeChannel(channel)
+    }
   }, [orderId])
 
   const createInvoice = async () => {
@@ -68,15 +99,9 @@ export default function PaymentPage({
       console.log('[DEBUG] Payment status checked:', data.payment_status, 'NODE_ENV:', process.env.NODE_ENV)
 
       if (data.payment_status === 'PAID') {
-        console.log('[DEBUG] Payment PAID! Redirect?', process.env.NODE_ENV === 'production', data.order_number)
-        // Redirect to success page in production
-        if (process.env.NODE_ENV === 'production') {
-          router.push(`/payment/success?orderNumber=${data.order_number}`)
-        } else {
-          // Show modal in development
-          setOrderNumber(data.order_number)
-          setSuccessModalOpen(true)
-        }
+        console.log('[DEBUG] Payment PAID! Redirecting to success page...', data.order_number)
+        // Always redirect to success page
+        router.push(`/payment/success?orderNumber=${data.order_number}`)
       }
     } catch (error) {
       console.error('Status check error:', error)
@@ -98,15 +123,9 @@ export default function PaymentPage({
       const data = await res.json()
       
       if (res.ok) {
-        // Redirect to success page in production
-        if (process.env.NODE_ENV === 'production') {
-          router.push(`/payment/success?orderNumber=${data.order_number}`)
-        } else {
-          // Show modal in development
-          setOrderNumber(data.order_number)
-          setSuccessModalOpen(true)
-          toast.success('Төлбөр баталгаажлаа! SMS илгээгдлээ.')
-        }
+        // Always redirect to success page
+        router.push(`/payment/success?orderNumber=${data.order_number}`)
+        toast.success('Төлбөр баталгаажлаа! SMS илгээгдлээ.')
       } else {
         toast.error(data.error || 'Алдаа гарлаа')
       }
@@ -229,56 +248,6 @@ export default function PaymentPage({
           </CardContent>
         </Card>
       </div>
-
-      {/* Success Modal */}
-      <Dialog open={successModalOpen} onOpenChange={setSuccessModalOpen}>
-        <DialogContent className="text-center">
-          <DialogHeader>
-            <div className="flex justify-center mb-4">
-              <CheckCircle className="h-16 w-16 text-green-600" />
-            </div>
-            <DialogTitle className="text-2xl text-center">
-              Төлбөр амжилттай төлөгдлөө! 🎉
-            </DialogTitle>
-            <DialogDescription className="text-center">
-              <div className="space-y-3">
-                <div className="text-base text-foreground">
-                  Таны захиалга баталгаажлаа.
-                </div>
-                {orderNumber && (
-                  <div className="text-sm font-mono bg-gray-100 p-2 rounded">
-                    Захиалгын дугаар: <strong>{orderNumber}</strong>
-                  </div>
-                )}
-                <div className="text-sm text-muted-foreground">
-                  SMS мэдэгдлийг таны утас руу илгээлээ.
-                </div>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button 
-              className="w-full"
-              onClick={() => {
-                setSuccessModalOpen(false)
-                router.push('/')
-              }}
-            >
-              Нүүр хуудас руу буцах
-            </Button>
-            <Button 
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                setSuccessModalOpen(false)
-                router.push('/books')
-              }}
-            >
-              Дахин худалдан авах
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

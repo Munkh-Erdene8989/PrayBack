@@ -67,8 +67,14 @@ export default function PaymentPage({
       const data = await res.json()
 
       if (data.payment_status === 'PAID') {
-        setOrderNumber(data.order_number)
-        setSuccessModalOpen(true)
+        // Redirect to success page in production
+        if (process.env.NODE_ENV === 'production') {
+          router.push(`/payment/success?orderNumber=${data.order_number}`)
+        } else {
+          // Show modal in development
+          setOrderNumber(data.order_number)
+          setSuccessModalOpen(true)
+        }
       }
     } catch (error) {
       console.error('Status check error:', error)
@@ -90,9 +96,15 @@ export default function PaymentPage({
       const data = await res.json()
       
       if (res.ok) {
-        setOrderNumber(data.order_number)
-        setSuccessModalOpen(true)
-        toast.success('Төлбөр баталгаажлаа! SMS илгээгдлээ.')
+        // Redirect to success page in production
+        if (process.env.NODE_ENV === 'production') {
+          router.push(`/payment/success?orderNumber=${data.order_number}`)
+        } else {
+          // Show modal in development
+          setOrderNumber(data.order_number)
+          setSuccessModalOpen(true)
+          toast.success('Төлбөр баталгаажлаа! SMS илгээгдлээ.')
+        }
       } else {
         toast.error(data.error || 'Алдаа гарлаа')
       }
@@ -102,6 +114,7 @@ export default function PaymentPage({
   }
 
   const isMockMode = process.env.NEXT_PUBLIC_QPAY_MOCK_MODE === 'true' || invoice?.invoice_id?.startsWith('MOCK_')
+  const isDevelopment = process.env.NODE_ENV === 'development'
 
   if (loading) {
     return (
@@ -133,15 +146,17 @@ export default function PaymentPage({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Development Mode Notice */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800 font-medium mb-2">
-                💡 Development Mode
-              </p>
-              <p className="text-xs text-blue-600 mb-2">
-                Localhost дээр QPay webhook ирж чадахгүй. Төлбөр төлсний дараа доорх товчоор manual баталгаажуулна уу.
-              </p>
-            </div>
+            {/* Development Mode Notice - Only in Development */}
+            {isDevelopment && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800 font-medium mb-2">
+                  💡 Development Mode
+                </p>
+                <p className="text-xs text-blue-600 mb-2">
+                  Localhost дээр QPay webhook ирж чадахгүй. Төлбөр төлсний дараа доорх товчоор manual баталгаажуулна уу.
+                </p>
+              </div>
+            )}
             {/* QR Code */}
             <div className="flex justify-center">
               {invoice.qr_image ? (
@@ -188,13 +203,15 @@ export default function PaymentPage({
               </div>
             )}
 
-            {/* Manual Complete Button (Development) */}
-            <Button
-              className="w-full bg-green-600 hover:bg-green-700"
-              onClick={handleManualComplete}
-            >
-              ✅ Төлбөр Төлсөн (Manual Confirm + SMS)
-            </Button>
+            {/* Manual Complete Button - Only in Development */}
+            {isDevelopment && (
+              <Button
+                className="w-full bg-green-600 hover:bg-green-700"
+                onClick={handleManualComplete}
+              >
+                ✅ Төлбөр Төлсөн (Manual Confirm + SMS)
+              </Button>
+            )}
 
             <Button
               variant="outline"

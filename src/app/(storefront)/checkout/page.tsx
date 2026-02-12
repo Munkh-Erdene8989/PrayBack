@@ -42,14 +42,11 @@ export default function CheckoutPage() {
           ...prev,
           customer_phone: data.user.phone,
         }))
-      } else {
-        // User not logged in, redirect to login
-        toast.error('Захиалга үүсгэхийн тулд нэвтэрнэ үү')
-        router.push('/login')
       }
+      // Guest checkout allowed - no redirect needed
     } catch (error) {
-      toast.error('Нэвтрэх шаардлагатай')
-      router.push('/login')
+      // Guest checkout allowed - no redirect needed
+      console.log('Guest checkout mode')
     }
   }
 

@@ -35,11 +35,7 @@ export function BookCard({ book }: BookCardProps) {
         <p className="text-lg font-bold text-primary">
           {book.price.toLocaleString()}₮
         </p>
-        {book.stock_quantity > 0 ? (
-          <p className="text-xs text-green-600">Нөөцөд байгаа</p>
-        ) : (
-          <p className="text-xs text-red-600">Дууссан</p>
-        )}
+        <p className="text-xs text-green-600">Дижитал хувилбар</p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <AddToCartButton book={book} />

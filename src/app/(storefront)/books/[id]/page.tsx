@@ -69,13 +69,9 @@ export default async function BookDetailPage({
             <p className="text-3xl font-bold text-primary">
               {book.price.toLocaleString()}₮
             </p>
-            {book.stock_quantity > 0 ? (
-              <p className="text-sm text-green-600 mt-2">
-                Нөөцөд {book.stock_quantity} ширхэг байгаа
-              </p>
-            ) : (
-              <p className="text-sm text-red-600 mt-2">Дууссан</p>
-            )}
+            <p className="text-sm text-green-600 mt-2">
+              Дижитал хувилбар - Шууд татаж авах боломжтой
+            </p>
           </div>
 
           <AddToCartButton book={book} />

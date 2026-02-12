@@ -81,7 +81,6 @@ export default function CheckoutPage() {
           ...formData,
           items: items.map((item) => ({
             book_id: item.book.id,
-            quantity: item.quantity,
             unit_price: item.book.price,
           })),
           subtotal: getTotalPrice(),
@@ -208,10 +207,10 @@ export default function CheckoutPage() {
             <CardContent className="space-y-4">
               {items.map((item) => (
                 <div key={item.book.id} className="flex justify-between text-sm">
-                  <span>
-                    {item.book.title} x {item.quantity}
+                  <span className="flex-1 pr-2">
+                    {item.book.title}
                   </span>
-                  <span>{(item.book.price * item.quantity).toLocaleString()}₮</span>
+                  <span className="font-medium">{item.book.price.toLocaleString()}₮</span>
                 </div>
               ))}
               

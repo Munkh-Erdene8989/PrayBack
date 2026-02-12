@@ -4,9 +4,8 @@ import { Book, CartItem } from '@/types'
 
 interface CartStore {
   items: CartItem[]
-  addItem: (book: Book, quantity?: number) => void
+  addItem: (book: Book) => void
   removeItem: (bookId: string) => void
-  updateQuantity: (bookId: string, quantity: number) => void
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
@@ -17,22 +16,17 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       
-      addItem: (book, quantity = 1) => {
+      addItem: (book) => {
         set((state) => {
           const existingItem = state.items.find(item => item.book.id === book.id)
           
+          // For digital books, don't add duplicates - one copy per book
           if (existingItem) {
-            return {
-              items: state.items.map(item =>
-                item.book.id === book.id
-                  ? { ...item, quantity: item.quantity + quantity }
-                  : item
-              ),
-            }
+            return state
           }
           
           return {
-            items: [...state.items, { book, quantity }],
+            items: [...state.items, { book }],
           }
         })
       },
@@ -43,31 +37,16 @@ export const useCartStore = create<CartStore>()(
         }))
       },
       
-      updateQuantity: (bookId, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(bookId)
-          return
-        }
-        
-        set((state) => ({
-          items: state.items.map(item =>
-            item.book.id === bookId
-              ? { ...item, quantity }
-              : item
-          ),
-        }))
-      },
-      
       clearCart: () => {
         set({ items: [] })
       },
       
       getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0)
+        return get().items.length
       },
       
       getTotalPrice: () => {
-        return get().items.reduce((total, item) => total + (item.book.price * item.quantity), 0)
+        return get().items.reduce((total, item) => total + item.book.price, 0)
       },
     }),
     {

@@ -10,15 +10,16 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ book }: AddToCartButtonProps) {
-  const addItem = useCartStore((state) => state.addItem)
+  const { addItem, items } = useCartStore()
+  const isInCart = items.some(item => item.book.id === book.id)
 
   const handleAddToCart = () => {
-    if (book.stock_quantity <= 0) {
-      toast.error('Энэ ном дууссан байна')
+    if (isInCart) {
+      toast.info('Энэ ном аль хэдийн сагсанд байна')
       return
     }
 
-    addItem(book, 1)
+    addItem(book)
     toast.success('Сагсанд нэмэгдлээ')
   }
 
@@ -27,9 +28,9 @@ export function AddToCartButton({ book }: AddToCartButtonProps) {
       className="w-full" 
       size="lg"
       onClick={handleAddToCart}
-      disabled={book.stock_quantity <= 0}
+      disabled={isInCart}
     >
-      {book.stock_quantity > 0 ? 'Сагсанд нэмэх' : 'Дууссан'}
+      {isInCart ? 'Сагсанд байгаа' : 'Сагсанд нэмэх'}
     </Button>
   )
 }

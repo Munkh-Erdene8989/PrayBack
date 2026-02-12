@@ -10,7 +10,7 @@ export type AdminSession = Database['public']['Tables']['admin_sessions']['Row']
 
 export interface CartItem {
   book: Book
-  quantity: number
+  // Digital books don't need quantity tracking - unlimited copies available
 }
 
 export interface CheckoutFormData {

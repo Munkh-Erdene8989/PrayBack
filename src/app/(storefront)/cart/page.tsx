@@ -2,12 +2,11 @@
 
 import { useCartStore } from '@/lib/store/cart-store'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore()
+  const { items, removeItem, getTotalPrice } = useCartStore()
 
   if (items.length === 0) {
     return (
@@ -54,30 +53,11 @@ export default function CartPage() {
                     <p className="text-sm text-muted-foreground">
                       {item.book.author}
                     </p>
-                    <p className="text-lg font-bold text-primary mt-2">
-                      {item.book.price.toLocaleString()}₮
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Дижитал хувилбар
                     </p>
 
                     <div className="flex items-center gap-4 mt-4">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.book.id, item.quantity - 1)}
-                        >
-                          -
-                        </Button>
-                        <span className="w-12 text-center">{item.quantity}</span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.book.id, item.quantity + 1)}
-                          disabled={item.quantity >= item.book.stock_quantity}
-                        >
-                          +
-                        </Button>
-                      </div>
-
                       <Button
                         size="sm"
                         variant="destructive"
@@ -89,8 +69,8 @@ export default function CartPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className="font-bold">
-                      {(item.book.price * item.quantity).toLocaleString()}₮
+                    <p className="text-lg font-bold text-primary">
+                      {item.book.price.toLocaleString()}₮
                     </p>
                   </div>
                 </div>

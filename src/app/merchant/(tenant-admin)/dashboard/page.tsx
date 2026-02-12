@@ -76,18 +76,34 @@ export default async function TenantDashboardPage() {
       .eq('delivery_status', 'CANCELLED'),
   ])
 
-  // Top selling books
-  const { data: topBooks } = await supabase
+  // Top selling books - count how many times each book was ordered
+  const { data: orderItems } = await supabase
     .from('order_items')
     .select(`
       book_id,
-      quantity,
       books (title, price),
       orders!inner (tenant_id, payment_status)
     `)
     .eq('orders.tenant_id', tenantId)
     .eq('orders.payment_status', 'PAID')
-    .limit(5)
+
+  // Aggregate by book_id to count sales
+  const bookSalesMap = new Map()
+  orderItems?.forEach((item: any) => {
+    const bookId = item.book_id
+    if (!bookSalesMap.has(bookId)) {
+      bookSalesMap.set(bookId, {
+        book: item.books,
+        count: 0,
+      })
+    }
+    bookSalesMap.get(bookId).count += 1
+  })
+
+  // Convert to array and sort by count
+  const topBooks = Array.from(bookSalesMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
 
   return (
     <div className="space-y-8">
@@ -159,17 +175,20 @@ export default async function TenantDashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {topBooks?.slice(0, 5).map((item: any, index: number) => (
+            {topBooks?.map((item: any, index: number) => (
               <div key={index} className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{item.books?.title}</p>
+                  <p className="font-medium">{item.book?.title}</p>
                   <p className="text-sm text-muted-foreground">
-                    {item.quantity} sold
+                    {item.count} {item.count === 1 ? 'order' : 'orders'}
                   </p>
                 </div>
-                <p className="font-bold">{item.books?.price.toLocaleString()}₮</p>
+                <p className="font-bold">{item.book?.price.toLocaleString()}₮</p>
               </div>
             ))}
+            {topBooks?.length === 0 && (
+              <p className="text-sm text-muted-foreground">No sales data yet</p>
+            )}
           </div>
         </CardContent>
       </Card>

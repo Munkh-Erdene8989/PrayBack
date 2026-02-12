@@ -17,7 +17,6 @@ export default function NewBookPage() {
     isbn: '',
     description: '',
     price: '',
-    stock_quantity: '0',
     category: '',
     published_year: '',
     cover_image_url: '',
@@ -34,7 +33,6 @@ export default function NewBookPage() {
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
-          stock_quantity: parseInt(formData.stock_quantity),
           published_year: formData.published_year ? parseInt(formData.published_year) : null,
         }),
       })
@@ -113,7 +111,7 @@ export default function NewBookPage() {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="price">Price (₮) *</Label>
                 <Input
@@ -125,22 +123,13 @@ export default function NewBookPage() {
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                 />
+                <p className="text-xs text-muted-foreground">
+                  Digital books - No stock management needed
+                </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stock_quantity">Stock *</Label>
-                <Input
-                  id="stock_quantity"
-                  type="number"
-                  required
-                  min="0"
-                  value={formData.stock_quantity}
-                  onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="published_year">Year</Label>
+                <Label htmlFor="published_year">Published Year</Label>
                 <Input
                   id="published_year"
                   type="number"

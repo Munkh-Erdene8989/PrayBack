@@ -34,7 +34,6 @@ export default async function AdminBooksPage() {
                   <th className="text-left py-3 px-4">Title</th>
                   <th className="text-left py-3 px-4">Author</th>
                   <th className="text-left py-3 px-4">Price</th>
-                  <th className="text-left py-3 px-4">Stock</th>
                   <th className="text-left py-3 px-4">Status</th>
                   <th className="text-left py-3 px-4">Actions</th>
                 </tr>
@@ -45,7 +44,6 @@ export default async function AdminBooksPage() {
                     <td className="py-3 px-4">{book.title}</td>
                     <td className="py-3 px-4">{book.author}</td>
                     <td className="py-3 px-4">{book.price.toLocaleString()}₮</td>
-                    <td className="py-3 px-4">{book.stock_quantity}</td>
                     <td className="py-3 px-4">
                       <span
                         className={`px-2 py-1 rounded text-xs ${

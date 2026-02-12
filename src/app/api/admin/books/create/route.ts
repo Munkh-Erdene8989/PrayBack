@@ -8,7 +8,7 @@ const createBookSchema = z.object({
   isbn: z.string().optional(),
   description: z.string().optional(),
   price: z.number().positive(),
-  stock_quantity: z.number().min(0),
+  // stock_quantity removed - digital books don't need inventory tracking
   category: z.string().optional(),
   published_year: z.number().optional().nullable(),
   cover_image_url: z.string().url().optional().or(z.literal('')),

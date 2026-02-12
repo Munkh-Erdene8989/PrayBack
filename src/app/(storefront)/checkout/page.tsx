@@ -143,9 +143,11 @@ export default function CheckoutPage() {
                     id="customer_phone"
                     type="tel"
                     required
+                    placeholder="88001234"
                     value={formData.customer_phone}
                     onChange={(e) => setFormData({ ...formData, customer_phone: e.target.value })}
                   />
+                  <p className="text-xs text-muted-foreground">8 оронтой утасны дугаар оруулна уу</p>
                 </div>
 
                 <div className="space-y-2">

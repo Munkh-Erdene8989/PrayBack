@@ -20,12 +20,18 @@ const createOrderSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    
+    // Clean phone number (remove spaces, dashes, etc.)
+    if (body.customer_phone) {
+      body.customer_phone = body.customer_phone.replace(/\D/g, '')
+    }
+    
     const validation = createOrderSchema.safeParse(body)
     
     if (!validation.success) {
       const errorMessages = validation.error.errors.map(err => {
         if (err.path[0] === 'customer_phone') {
-          return 'Утасны дугаар 8 орноос багагүй байх ёстой'
+          return 'Утасны дугаар 8 оронтой байх ёстой'
         }
         return err.message
       })

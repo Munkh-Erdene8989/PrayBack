@@ -22,6 +22,15 @@ async function getAccessToken(): Promise<string> {
     return tokenCache.token
   }
 
+  // Debug: log credentials status (DO NOT log actual values in production!)
+  console.log('QPay Auth Debug:', {
+    hasClientId: !!QPAY_CLIENT_ID,
+    hasClientSecret: !!QPAY_CLIENT_SECRET,
+    clientIdLength: QPAY_CLIENT_ID?.length,
+    secretLength: QPAY_CLIENT_SECRET?.length,
+    apiUrl: QPAY_API_URL,
+  })
+
   const credentials = Buffer.from(`${QPAY_CLIENT_ID}:${QPAY_CLIENT_SECRET}`).toString('base64')
 
   const response = await fetch(`${QPAY_API_URL}/auth/token`, {

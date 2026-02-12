@@ -8,18 +8,31 @@ export async function GET() {
     if (!session) {
       return NextResponse.json(
         { error: 'Not authenticated' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, must-revalidate',
+          }
+        }
       )
     }
 
-    return NextResponse.json({
-      user: {
-        userId: session.userId,
-        phone: session.phone,
-        role: session.role,
+    return NextResponse.json(
+      {
+        user: {
+          userId: session.userId,
+          phone: session.phone,
+          role: session.role,
+        },
       },
-    })
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=60',
+        }
+      }
+    )
   } catch (error) {
+    console.error('Session error:', error)
     return NextResponse.json(
       { error: 'Failed to get session' },
       { status: 500 }

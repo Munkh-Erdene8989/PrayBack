@@ -20,15 +20,23 @@ export function StorefrontHeader() {
     // Check if user is logged in (session cookie exists)
     const checkSession = async () => {
       try {
-        const res = await fetch('/api/auth/me')
+        const res = await fetch('/api/auth/me', {
+          cache: 'no-store',
+        })
         if (res.ok) {
           const data = await res.json()
           setUser(data.user)
+        } else if (res.status === 401) {
+          // User not authenticated - this is expected, no error logging needed
+          setUser(null)
         }
       } catch (error) {
-        // User not logged in
+        // Network or other error - user not logged in
+        setUser(null)
       }
     }
+    
+    // Only check once when component mounts
     checkSession()
   }, [])
 

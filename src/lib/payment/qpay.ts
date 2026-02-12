@@ -1,8 +1,10 @@
 import { QPayInvoiceResponse } from '@/types'
 
 const QPAY_API_URL = process.env.QPAY_API_URL || 'https://merchant-sandbox.qpay.mn/v2'
-const QPAY_CLIENT_ID = process.env.QPAY_CLIENT_ID!
-const QPAY_CLIENT_SECRET = process.env.QPAY_CLIENT_SECRET!
+const QPAY_CLIENT_ID = process.env.QPAY_CLIENT_ID
+const QPAY_CLIENT_SECRET = process.env.QPAY_CLIENT_SECRET
+const QPAY_CLIENT_USERNAME = process.env.QPAY_CLIENT_USERNAME
+const QPAY_CLIENT_PASSWORD = process.env.QPAY_CLIENT_PASSWORD
 const QPAY_INVOICE_CODE = process.env.QPAY_INVOICE_CODE!
 const QPAY_RECEIVER_CODE = process.env.QPAY_RECEIVER_CODE || 'terminal'
 const QPAY_MOCK_MODE = process.env.QPAY_MOCK_MODE === 'true'
@@ -22,16 +24,25 @@ async function getAccessToken(): Promise<string> {
     return tokenCache.token
   }
 
+  // Use USERNAME/PASSWORD if available, otherwise fallback to CLIENT_ID/CLIENT_SECRET
+  const username = QPAY_CLIENT_USERNAME || QPAY_CLIENT_ID
+  const password = QPAY_CLIENT_PASSWORD || QPAY_CLIENT_SECRET
+
   // Debug: log credentials status (DO NOT log actual values in production!)
   console.log('QPay Auth Debug:', {
-    hasClientId: !!QPAY_CLIENT_ID,
-    hasClientSecret: !!QPAY_CLIENT_SECRET,
-    clientIdLength: QPAY_CLIENT_ID?.length,
-    secretLength: QPAY_CLIENT_SECRET?.length,
+    hasUsername: !!username,
+    hasPassword: !!password,
+    usernameLength: username?.length,
+    passwordLength: password?.length,
     apiUrl: QPAY_API_URL,
+    authType: QPAY_CLIENT_USERNAME ? 'USERNAME/PASSWORD' : 'CLIENT_ID/SECRET',
   })
 
-  const credentials = Buffer.from(`${QPAY_CLIENT_ID}:${QPAY_CLIENT_SECRET}`).toString('base64')
+  if (!username || !password) {
+    throw new Error('QPay credentials not configured')
+  }
+
+  const credentials = Buffer.from(`${username}:${password}`).toString('base64')
 
   const response = await fetch(`${QPAY_API_URL}/auth/token`, {
     method: 'POST',

@@ -57,17 +57,10 @@ http://localhost:3000/admin/dashboard
 
 ## 📋 Бусад Нэвтрэх Мэдээлэл
 
-### Tenant Admin - Салбар 1
+### Tenant Admin (бүх салбар нэг URL)
 ```
-URL: http://merchant.branch1.localhost:3000
-Username: admin1
-Password: password123
-```
-
-### Tenant Admin - Салбар 2
-```
-URL: http://merchant.branch2.localhost:3000
-Username: admin2
+URL: http://merchant.localhost:3000 (dev) эсвэл https://merchant.mydomain.mn (prod)
+Username: admin1 эсвэл admin2 (tenant бүр өөрийн нэвтрэх нэртэй)
 Password: password123
 ```
 

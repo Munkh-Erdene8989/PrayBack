@@ -37,15 +37,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Send OTP via CallPro SMS
-    const { sendSMS } = await import('@/lib/sms/callpro')
-    const smsSent = await sendSMS({
-      to: phone,
-      message: `Таны OTP код: ${otp}. 5 минутын дотор хүчинтэй.`,
-    })
+    // Send OTP via CallPro SMS (or log to console in dev when not configured)
+    const { sendSMS, isCallProConfigured } = await import('@/lib/sms/callpro')
+    let smsSent = false
+
+    if (isCallProConfigured()) {
+      smsSent = await sendSMS({
+        to: phone,
+        message: `Таны OTP код: ${otp}. 5 минутын дотор хүчинтэй.`,
+      })
+    }
 
     if (!smsSent) {
-      console.error('SMS send failed')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('\n📱 [DEV] OTP код (SMS илгээгдээгүй - CallPro тохируулаагүй):', otp)
+        console.log('   Утас:', phone, '\n')
+      } else {
+        console.error('SMS send failed - CallPro may not be configured')
+        return NextResponse.json(
+          { error: 'SMS илгээх тохиргоо алга. Админтай холбогдоно уу.' },
+          { status: 503 }
+        )
+      }
     }
 
     return NextResponse.json({
@@ -54,8 +67,12 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Send OTP error:', error)
+    const message = error instanceof Error ? error.message : 'Failed to send OTP'
     return NextResponse.json(
-      { error: 'Failed to send OTP' },
+      {
+        error: 'Failed to send OTP',
+        ...(process.env.NODE_ENV === 'development' && { details: message }),
+      },
       { status: 500 }
     )
   }

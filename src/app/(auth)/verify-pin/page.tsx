@@ -46,7 +46,11 @@ function VerifyPINForm() {
       }
 
       toast.success('Амжилттай нэвтэрлээ')
-      router.push('/')
+      if (data.role === 'superadmin') {
+        router.push('/admin/dashboard')
+      } else {
+        router.push('/')
+      }
     } catch (error: any) {
       console.error('PIN verification error:', error)
       toast.error(error.message || 'PIN код буруу байна')

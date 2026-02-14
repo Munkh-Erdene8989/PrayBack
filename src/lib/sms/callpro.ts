@@ -1,6 +1,10 @@
-const CALLPRO_API_URL = process.env.CALLPRO_API_URL!
-const CALLPRO_API_KEY = process.env.CALLPRO_API_KEY!
+const CALLPRO_API_URL = process.env.CALLPRO_API_URL
+const CALLPRO_API_KEY = process.env.CALLPRO_API_KEY
 const CALLPRO_SENDER_NAME = process.env.CALLPRO_SENDER_NAME || '72720880'
+
+export function isCallProConfigured(): boolean {
+  return !!(CALLPRO_API_URL && CALLPRO_API_KEY)
+}
 
 export const SMS_TEMPLATES = {
   ORDER_CONFIRMED: (orderNumber: string) => 
@@ -18,6 +22,10 @@ export async function sendSMS(params: {
   message: string
 }): Promise<boolean> {
   try {
+    if (!CALLPRO_API_URL || !CALLPRO_API_KEY) {
+      console.warn('CallPro SMS not configured: CALLPRO_API_URL or CALLPRO_API_KEY missing')
+      return false
+    }
     // CallPro (MessagePro) API - GET method with query params
     const url = new URL(CALLPRO_API_URL)
     url.searchParams.append('from', CALLPRO_SENDER_NAME)

@@ -5,6 +5,19 @@ const SESSION_SECRET = new TextEncoder().encode(
   process.env.SESSION_SECRET || 'default-secret-change-in-production'
 )
 
+/** Verify JWT session token from cookie string (e.g. in middleware). Returns session payload or null. */
+export async function verifySessionToken(
+  token: string | undefined
+): Promise<SessionData | null> {
+  if (!token) return null
+  try {
+    const { payload } = await jwtVerify(token, SESSION_SECRET)
+    return payload as unknown as SessionData
+  } catch {
+    return null
+  }
+}
+
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000 // 30 days in milliseconds
 
 export interface SessionData {

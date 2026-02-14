@@ -24,7 +24,7 @@
 - 📦 **Хүргэлт мэдэгдэл**: SMS-ээр хүргэлтийн мэдээлэл авах
 
 ### Tenant Admin
-- 🏢 **Subdomain нэвтрэлт**: merchant.{slug}.localhost:3000
+- 🏢 **Нэг merchant URL**: merchant.mydomain.mn (бүх tenant админ энд нэвтэрнэ; merchant.{slug}.mydomain.mn хэрэглэхгүй)
 - 📊 **Dashboard**: Борлуулалтын KPI, график
 - 📋 **Захиалга удирдлага**: Зөвхөн өөрийн tenant-ийн захиалга
 - ✅ **Хүргэлт toggle**: Delivered дарахад автомат SMS явна
@@ -44,17 +44,10 @@ Phone: 89897803
 PIN: (аль хэдийн тохируулагдсан)
 ```
 
-### 2. Tenant Admin - Салбар 1
+### 2. Tenant Admin (бүх салбар нэг URL)
 ```
-URL: http://merchant.branch1.localhost:3000
-Username: admin1
-Password: password123
-```
-
-### 3. Tenant Admin - Салбар 2
-```
-URL: http://merchant.branch2.localhost:3000
-Username: admin2
+URL: http://merchant.localhost:3000 (dev) эсвэл https://merchant.mydomain.mn (prod)
+Username: admin1 эсвэл admin2 (tenant бүр өөрийн нэвтрэх нэртэй)
 Password: password123
 ```
 
@@ -69,12 +62,11 @@ Phone: ямар ч дугаар
 
 ## 🛠️ Тохиргоо
 
-### 1. Subdomain (Local Development)
+### 1. Merchant Admin (Local Development)
 
-`/etc/hosts` файлд нэмнэ:
+Бүх tenant админ нэг URL-аар нэвтэрнэ. `/etc/hosts` файлд нэмнэ:
 ```bash
-127.0.0.1 merchant.branch1.localhost
-127.0.0.1 merchant.branch2.localhost
+127.0.0.1 merchant.localhost
 ```
 
 macOS/Linux:
@@ -110,9 +102,9 @@ sudo nano /etc/hosts
 
 ### Б. Tenant Admin урсгал
 
-1. `/etc/hosts` тохируулах (дээр харна уу)
-2. **http://merchant.branch1.localhost:3000** рүү орно
-3. Login: **admin1** / **password123**
+1. `/etc/hosts`-д `127.0.0.1 merchant.localhost` нэмнэ
+2. **http://merchant.localhost:3000** рүү орно
+3. Login: **admin1** / **password123** (эсвэл admin2 / password123)
 4. Dashboard үзнэ:
    - Өнөөдрийн борлуулалт
    - Захиалгын статистик
@@ -277,10 +269,10 @@ tenants ←→ admin_sessions
 - Network tab дээр API request харах
 - Invoice code зөв эсэхийг шалгах: AYLAY_MN_INVOICE
 
-### Subdomain ажиллахгүй байвал?
-- `/etc/hosts` файл шалгах
+### Merchant admin нэвтрэхгүй байвал?
+- `/etc/hosts`-д `127.0.0.1 merchant.localhost` нэмсэн эсэхийг шалгах
 - Browser restart хийх
-- Format: merchant.{slug}.localhost:3000
+- Dev: http://merchant.localhost:3000, Prod: https://merchant.mydomain.mn (MERCHANT_HOST env)
 
 ### Database холбогдохгүй байвал?
 - .env.local дээр Supabase credentials шалгах

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
+import { verifySessionToken } from '@/lib/auth/session'
 
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
@@ -8,15 +9,19 @@ export async function middleware(request: NextRequest) {
   // Handle Supabase auth session
   const { supabaseResponse, user } = await updateSession(request)
 
-  // Check for merchant subdomain
-  const isMerchantSubdomain = hostname.startsWith('merchant.')
-  
-  if (isMerchantSubdomain) {
-    // Extract tenant slug from subdomain
-    // Format: merchant.{slug}.localhost:3000 or merchant.{slug}.yourdomain.com
-    const parts = hostname.split('.')
-    const tenantSlug = parts.length > 2 ? parts[1] : null
+  // Custom JWT session (phone+PIN login) – for superadmin /admin access
+  const sessionToken = request.cookies.get('session')?.value
+  const customSession = await verifySessionToken(sessionToken)
+  const isSuperadmin = customSession?.role === 'superadmin'
 
+  // Merchant admin: only single host (merchant.mydomain.mn), NOT per-tenant subdomains (merchant.{slug}.mydomain.mn)
+  const host = hostname.split(':')[0]
+  const merchantHost =
+    process.env.MERCHANT_HOST ||
+    (process.env.NODE_ENV === 'development' ? 'merchant.localhost' : 'merchant.mydomain.mn')
+  const isMerchantPortal = host === merchantHost
+
+  if (isMerchantPortal) {
     // Check if accessing login page
     if (pathname.startsWith('/merchant/login')) {
       return supabaseResponse
@@ -24,24 +29,19 @@ export async function middleware(request: NextRequest) {
 
     // Check tenant admin session
     const tenantSession = request.cookies.get('tenant_session')
-    
+
     if (!tenantSession && !pathname.startsWith('/merchant/login')) {
-      // Redirect to merchant login if no session
       return NextResponse.redirect(new URL('/merchant/login', request.url))
     }
 
-    // Allow merchant routes
     return supabaseResponse
   }
 
-  // Protect admin routes
+  // Protect admin routes: allow Supabase user or custom session superadmin
   if (pathname.startsWith('/admin')) {
-    if (!user) {
+    if (!user && !isSuperadmin) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    
-    // TODO: Add superadmin role check here
-    // For now, any authenticated user can access admin
     return supabaseResponse
   }
 

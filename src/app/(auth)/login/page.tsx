@@ -38,8 +38,11 @@ export default function LoginPage() {
           body: JSON.stringify({ phone }),
         })
 
+        const otpData = await otpRes.json().catch(() => ({}))
         if (!otpRes.ok) {
-          throw new Error('Failed to send OTP')
+          const msg = otpData.error || 'OTP илгээхэд алдаа гарлаа'
+          const hint = otpData.details ? ` (${otpData.details})` : ''
+          throw new Error(msg + hint)
         }
 
         toast.success('OTP код таны утас руу илгээгдлээ')
@@ -47,7 +50,8 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error('Login error:', error)
-      toast.error('Алдаа гарлаа. Дахин оролдоно уу.')
+      const msg = error instanceof Error ? error.message : 'Алдаа гарлаа. Дахин оролдоно уу.'
+      toast.error(msg)
     } finally {
       setLoading(false)
     }

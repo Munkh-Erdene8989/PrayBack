@@ -26,14 +26,9 @@
 ## Login Credentials
 
 ### Tenant Admin Login
-Access via: http://merchant.branch1.localhost:3000 or http://merchant.branch2.localhost:3000
+All tenant admins use one URL: http://merchant.localhost:3000 (dev) or https://merchant.mydomain.mn (prod)
 
-**Branch 1:**
-- Username: `admin1`
-- Password: `password123`
-
-**Branch 2:**
-- Username: `admin2`
+- Username: `admin1` or `admin2` (each tenant has its own)
 - Password: `password123`
 
 ### SuperAdmin Login
@@ -64,9 +59,9 @@ Access via: http://merchant.branch1.localhost:3000 or http://merchant.branch2.lo
 
 ### 2. Test Tenant Admin:
 ```
-1. Add to /etc/hosts: 127.0.0.1 merchant.branch1.localhost
-2. Go to http://merchant.branch1.localhost:3000
-3. Login with admin1 / password123
+1. Add to /etc/hosts: 127.0.0.1 merchant.localhost
+2. Go to http://merchant.localhost:3000
+3. Login with admin1 / password123 (or admin2)
 4. View dashboard with KPIs
 5. See orders for your tenant
 6. Mark orders as delivered (sends SMS)
@@ -80,24 +75,21 @@ Access via: http://merchant.branch1.localhost:3000 or http://merchant.branch2.lo
 4. Manage books, tenants, etc.
 ```
 
-## Subdomain Setup (for Tenant Admin)
+## Merchant Admin URL (Tenant Admin)
 
 ### For Local Development:
 
 Edit `/etc/hosts`:
 ```
-127.0.0.1 merchant.branch1.localhost
-127.0.0.1 merchant.branch2.localhost
+127.0.0.1 merchant.localhost
 ```
 
-Then access:
-- Branch 1: http://merchant.branch1.localhost:3000
-- Branch 2: http://merchant.branch2.localhost:3000
+Then access: http://merchant.localhost:3000 (all tenant admins use this URL)
 
 ### For Production:
 
-1. Add DNS wildcard record: `*.yourdomain.com` → your server IP
-2. Configure Next.js to handle subdomains
+1. Set `MERCHANT_HOST=merchant.mydomain.mn` in env
+2. Add DNS: `merchant.mydomain.mn` → your server (no per-tenant subdomains)
 3. Deploy to Vercel/your hosting
 
 ## API Endpoints

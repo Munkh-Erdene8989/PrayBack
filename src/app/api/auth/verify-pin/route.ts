@@ -47,16 +47,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const role = (user.role as 'customer' | 'superadmin') || 'customer'
+
     // Create session
     await createSession({
       userId: user.id,
       phone: user.phone,
-      role: user.role as any || 'customer',
+      role,
     })
 
     return NextResponse.json({
       success: true,
       message: 'Login successful',
+      role,
     })
   } catch (error) {
     console.error('Verify PIN error:', error)
